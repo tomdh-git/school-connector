@@ -15,10 +15,11 @@ java {
 repositories {
     mavenLocal()
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
-    implementation("com.tomdh.courseapi:session-aware-web-client:1.0.0")
+    implementation("com.github.tomdh-git:session-aware-web-client:master-SNAPSHOT")
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
     implementation("org.springframework.boot:spring-boot-starter-actuator:3.3.4")
     implementation(kotlin("stdlib"))
