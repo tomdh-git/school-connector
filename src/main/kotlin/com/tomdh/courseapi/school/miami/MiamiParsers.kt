@@ -1,116 +1,124 @@
 package com.tomdh.courseapi.school.miami
 
-import com.tomdh.courseapi.school.models.CanonicalTimeWindow
-import com.tomdh.courseapi.school.models.Field
-import com.tomdh.courseapi.school.models.SchedulableSection
-import org.jsoup.Jsoup
+import com.tomdh.courseapi.course.CanonicalTimeWindow
+import com.tomdh.courseapi.course.SchedulableSection
+import com.tomdh.courseapi.field.Field
+import org.jsoup.Jsoup.parse
 
 /**
- * Parses Miami University course list HTML using Jsoup.
+ * Miami-specific HTML parsing. Produces [SchedulableSection]s with canonical
+ * fields and preserves all Miami-specific data in [SchedulableSection.data].
  */
 
-fun String.parseMiamiCoursesToMaps(): List<Map<String, Any?>> {
-    val doc = Jsoup.parse(this)
-    val rows = doc.select("#courseSectionSummary tr.resultrow")
-    
-    return rows.map { row ->
-        val cols = row.select("td")
-        val subject = cols[0].text()
-        val courseNum = cols[1].text()
-        val title = cols[2].text()
-        val section = cols[3].text()
-        val crn = cols[4].text().toIntOrNull() ?: 0
-        val campus = cols[5].text()
-        val creditHours = cols[6].text()
-        val enrollment = cols[7].text()
-        val waitlist = cols[8].text()
-        val delivery = cols[9].text()
+private val timeSlotRegex = Regex(
+    """([MTWRFSU]+)\s+(\d{1,2}:\d\d[ap]m)-(\d{1,2}:\d\d[ap]m)""",
+    RegexOption.IGNORE_CASE
+)
 
-        mapOf(
+private val dayCharToName = mapOf(
+    'M' to "MONDAY",
+    'T' to "TUESDAY",
+    'W' to "WEDNESDAY",
+    'R' to "THURSDAY",
+    'F' to "FRIDAY",
+    'S' to "SATURDAY",
+    'U' to "SUNDAY"
+)
+
+/**
+ * Parses Miami's delivery string (e.g. "MWF 10:00am-10:50am  01/13-05/02")
+ * into canonical [CanonicalTimeWindow]s.
+ */
+fun parseMiamiDeliveryToTimeWindows(delivery: String): List<CanonicalTimeWindow> {
+    val windows = mutableListOf<CanonicalTimeWindow>()
+    val matches = timeSlotRegex.findAll(delivery).toList()
+
+    for ((i, m) in matches.withIndex()) {
+        val (_, daysStr, startTime, endTime) = m.groupValues
+        val segmentEnd = if (i + 1 < matches.size) matches[i + 1].range.first else delivery.length
+        val afterText = delivery.substring(m.range.last + 1, segmentEnd)
+
+        val hasDateRange = afterText.contains(Regex("""\d{2}/\d{2}\s*-\s*\d{2}/\d{2}"""))
+        val hasSingleDate = afterText.contains(Regex("""\d{2}/\d{2}"""))
+        if (hasSingleDate && !hasDateRange) continue
+
+        for (dayChar in daysStr) {
+            val dayName = dayCharToName[dayChar.uppercaseChar()] ?: continue
+            windows.add(CanonicalTimeWindow(day = dayName, startTime = startTime, endTime = endTime))
+        }
+    }
+    return windows
+}
+
+fun String.parseMiamiCoursesToSections(): List<SchedulableSection> {
+    val rows = parse(this).select("tr.resultrow")
+    return rows.mapNotNull { row ->
+        val cells = row.select("td")
+        if (cells.size < 9) return@mapNotNull null
+
+        val subject = cells[0].ownText().trim()
+        val courseNum = cells[1].text().trim()
+        val title = cells[2].text().trim()
+        if (subject.isEmpty() && courseNum.isEmpty() && title.isEmpty()) return@mapNotNull null
+
+        val section = cells[3].text().trim()
+        val crn = cells[4].text().trim().filter { it.isDigit() }.toIntOrNull() ?: 0
+        val campus = cells[5].text().trim()
+        val credits = cells[6].text().trim().toIntOrNull() ?: 0
+        val capacity = cells[7].text().trim()
+        val requests = cells[8].text().trim()
+        val delivery = cells.getOrNull(9)?.text()?.trim() ?: ""
+
+        val data = mapOf<String, Any?>(
             "subject" to subject,
             "courseNum" to courseNum,
             "title" to title,
             "section" to section,
             "crn" to crn,
             "campus" to campus,
-            "creditHours" to creditHours,
-            "enrollment" to enrollment,
-            "waitlist" to waitlist,
-            "delivery" to delivery
+            "credits" to credits,
+            "capacity" to capacity,
+            "requests" to requests,
+            "delivery" to delivery,
+            "details" to ""
+        )
+
+        SchedulableSection(
+            name = "$subject $courseNum - $title",
+            timeWindows = parseMiamiDeliveryToTimeWindows(delivery),
+            data = data
         )
     }
 }
 
-fun Map<String, Any?>.toSchedulableSection(): SchedulableSection {
-    val subject = this["subject"]?.toString() ?: ""
-    val courseNum = this["courseNum"]?.toString() ?: ""
-    val title = this["title"]?.toString() ?: ""
-    val delivery = this["delivery"]?.toString() ?: ""
-
-    return SchedulableSection(
-        name = "$subject $courseNum - $title",
-        timeWindows = parseMiamiDeliveryToTimeWindows(delivery),
-        data = this
-    )
-}
-
-fun parseMiamiDeliveryToTimeWindows(delivery: String): List<CanonicalTimeWindow> {
-    if (delivery.isBlank() || delivery.contains("TBA")) return emptyList()
-
-    val windows = mutableListOf<CanonicalTimeWindow>()
-    val parts = delivery.split(Regex("""(?<=\d{2}/\d{2})\s+"""))
-
-    for (part in parts) {
-        val match = Regex("""([MTWRF]+)\s+(\d{1,2}:\d{2}[ap]m)-(\d{1,2}:\d{2}[ap]m)\s+(\d{2}/\d{2})-(\d{2}/\d{2})""")
-            .find(part) ?: continue
-
-        val days = match.groupValues[1]
-        val startTime = match.groupValues[2]
-        val endTime = match.groupValues[3]
-
-        days.forEach { char ->
-            val day = when (char) {
-                'M' -> "MONDAY"
-                'T' -> "TUESDAY"
-                'W' -> "WEDNESDAY"
-                'R' -> "THURSDAY"
-                'F' -> "FRIDAY"
-                else -> null
-            }
-            if (day != null) {
-                windows.add(CanonicalTimeWindow(day, startTime, endTime))
-            }
-        }
-    }
-    return windows
-}
-
-fun String.parseMiamiFields(): MiamiFields {
-    val doc = Jsoup.parse(this)
-    return MiamiFields(
-        terms = doc.select("#termFilter option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        campuses = doc.select("#campusFilter option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        subjects = doc.select("#subject option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        levels = doc.select("#level option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        partOfTerms = doc.select("#partOfTerm option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        attributes = doc.select("#sectionFilterAttributes option").map { it.attr("value") }.filter { it.isNotEmpty() },
-        deliveries = doc.select("#sectionAttributes option").map { it.attr("value") }.filter { it.isNotEmpty() }
-    )
-}
-
 fun String.parseMiamiTerms(): List<Field> {
-    val doc = Jsoup.parse(this)
-    return doc.select("#termFilter option")
-        .map { Field(it.attr("value")) }
-        .filter { it.name.isNotEmpty() }
+    return parse(this).select("select#termFilter option[value]").map { Field(it.attr("value").trim()) }
 }
 
-data class MiamiFields(
-    val terms: List<String>,
-    val campuses: List<String>,
-    val subjects: List<String>,
-    val levels: List<String>,
-    val partOfTerms: List<String>,
-    val attributes: List<String>,
-    val deliveries: List<String>
+/**
+ * ValidFields for Miami — kept internal to the Miami connector.
+ */
+data class MiamiValidFields(
+    val subjects: Set<String>,
+    val campuses: Set<String>,
+    val terms: Set<String>,
+    val deliveryTypes: Set<String>,
+    val levels: Set<String>,
+    val days: Set<String>,
+    val waitlistTypes: Set<String>,
+    val attributes: Set<String>
 )
+
+fun String.parseMiamiFields(): MiamiValidFields {
+    val doc = parse(this)
+    return MiamiValidFields(
+        subjects = doc.select("select#subject option[value]").map { it.attr("value").trim() }.filter { it.isNotEmpty() }.toSet(),
+        campuses = doc.select("select#campusFilter option[value]").map { it.attr("value").trim() }.filter { it.isNotEmpty() }.toSet(),
+        terms = doc.select("select#termFilter option[value]").map { it.attr("value").trim() }.toSet(),
+        deliveryTypes = doc.select("input.deliveryTypeCheckBox[value]").map { it.attr("value").trim() }.filter { it.isNotEmpty() }.toSet(),
+        levels = doc.select("select#levelFilter option[value]").map { it.attr("value").trim() }.toSet(),
+        days = doc.select("select#daysFilter option[value]").map { it.attr("value").trim() }.toSet(),
+        waitlistTypes = doc.select("select#openWaitlist option[value]").map { it.attr("value").trim() }.toSet(),
+        attributes = doc.select("select#sectionFilterAttributes option[value]").map { it.attr("value").trim() }.toSet()
+    )
+}

@@ -29,11 +29,11 @@
         {
           "name": "school-connector-1.0.0.jar",
           "url": "school-connector-1.0.0.jar",
-          "size": 57761,
-          "sha512": "b10c43885fe56c0967509e5a80133aadd5e5f8e53aa040592334e7345089866ac51ff28a5d368a3dec53c3c94b1080bc53de71a4979f09678e1160898fb518db",
-          "sha256": "59c9739c8b640fef0f141613122a92d29d5d59d02df2cfaf481d8597668b9485",
-          "sha1": "5d4caa14375196f45a9646cb2da546aa515dce29",
-          "md5": "a26445a61aafc56d39c3cdd250a0f851"
+          "size": 63259,
+          "sha512": "b765cccbc3e0ef9c9702991447385ecff18161a10935a2633a50c2d753f3bc344e1dd578d7b8150438c516ca5386a33d00afa754452691959a36b02eb2466003",
+          "sha256": "1a3f605ba2e5edceedc16088a65dcb35588b7ed01f796f0d4b3945847927aa29",
+          "sha1": "df5a0fb165681d6cb07cab8876aa211b10b7fab6",
+          "md5": "248b48e7dcd029fd37bc0eee57206c48"
         }
       ]
     },
@@ -71,6 +71,13 @@
           }
         },
         {
+          "group": "org.springframework.boot",
+          "module": "spring-boot-starter-cache",
+          "version": {
+            "requires": "3.3.4"
+          }
+        },
+        {
           "group": "org.jetbrains.kotlin",
           "module": "kotlin-stdlib"
         },
@@ -82,24 +89,10 @@
           }
         },
         {
-          "group": "org.springframework.boot",
-          "module": "spring-boot-starter-cache",
+          "group": "org.jetbrains.kotlinx",
+          "module": "kotlinx-coroutines-core",
           "version": {
-            "requires": "3.3.4"
-          }
-        },
-        {
-          "group": "org.jsoup",
-          "module": "jsoup",
-          "version": {
-            "requires": "1.17.2"
-          }
-        },
-        {
-          "group": "org.slf4j",
-          "module": "slf4j-api",
-          "version": {
-            "requires": "2.0.16"
+            "requires": "1.8.1"
           }
         },
         {
@@ -117,10 +110,17 @@
           }
         },
         {
-          "group": "org.jetbrains.kotlinx",
-          "module": "kotlinx-coroutines-core",
+          "group": "org.jsoup",
+          "module": "jsoup",
           "version": {
-            "requires": "1.8.1"
+            "requires": "1.17.2"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-api",
+          "version": {
+            "requires": "2.0.16"
           }
         }
       ],
@@ -137,11 +137,11 @@
         {
           "name": "school-connector-1.0.0.jar",
           "url": "school-connector-1.0.0.jar",
-          "size": 57761,
-          "sha512": "b10c43885fe56c0967509e5a80133aadd5e5f8e53aa040592334e7345089866ac51ff28a5d368a3dec53c3c94b1080bc53de71a4979f09678e1160898fb518db",
-          "sha256": "59c9739c8b640fef0f141613122a92d29d5d59d02df2cfaf481d8597668b9485",
-          "sha1": "5d4caa14375196f45a9646cb2da546aa515dce29",
-          "md5": "a26445a61aafc56d39c3cdd250a0f851"
+          "size": 63259,
+          "sha512": "b765cccbc3e0ef9c9702991447385ecff18161a10935a2633a50c2d753f3bc344e1dd578d7b8150438c516ca5386a33d00afa754452691959a36b02eb2466003",
+          "sha256": "1a3f605ba2e5edceedc16088a65dcb35588b7ed01f796f0d4b3945847927aa29",
+          "sha1": "df5a0fb165681d6cb07cab8876aa211b10b7fab6",
+          "md5": "248b48e7dcd029fd37bc0eee57206c48"
         }
       ]
     }
