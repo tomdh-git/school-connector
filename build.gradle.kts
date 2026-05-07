@@ -4,7 +4,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "com.tomdh.courseapi"
+group = "com.tomdh.schoolconnector"
 version = "1.0.0"
 
 java {
@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     // Session-aware web client (our own library)
-    implementation("com.github.tomdh-git:session-aware-web-client:master-SNAPSHOT")
+    implementation("com.github.tomdh-git:session-aware-web-client:8e4a5b71fb")
 
     // Spring Boot (non-starter, so we don't pull in auto-config)
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
