@@ -39,6 +39,12 @@ class MiamiConnector(
     }
 
     override suspend fun queryCourses(filters: Map<String, Any?>): List<SchedulableSection> {
+        val courses = queryCoursesLight(filters)
+        fetchSectionDetails(filters["term"].toString(), courses)
+        return courses
+    }
+
+    override suspend fun queryCoursesLight(filters: Map<String, Any?>): List<SchedulableSection> {
         val token = client.getOrFetchToken()
         if (token.isEmpty()) throw APIException("Empty Token")
 
@@ -63,16 +69,19 @@ class MiamiConnector(
             throw QueryException("Query returned too many results.")
         }
 
-        val courses = resp.body.parseMiamiCoursesToSections()
+        return resp.body.parseMiamiCoursesToSections()
+    }
+
+    override suspend fun fetchSectionDetails(term: String, sections: List<SchedulableSection>) {
+        if (sections.isEmpty()) return
         coroutineScope {
-            courses.map { course ->
+            sections.map { course ->
                 async {
-                    val temp = course.data + ("details" to client.getCourseDetails(filters["term"].toString(), course.data["crn"].toString()))
+                    val temp = course.data + ("details" to client.getCourseDetails(term, course.data["crn"].toString()))
                     course.data = temp
                 }
             }.awaitAll()
         }
-        return courses
     }
 
     override suspend fun validateFilters(filters: Map<String, Any?>): List<String> {
