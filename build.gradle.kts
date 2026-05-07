@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.github.tomdh-git"
-version = project.findProperty("version") ?: "main-SNAPSHOT"
+version = project.findProperty("version") ?: "master-SNAPSHOT"
 
 kotlin {
     jvmToolchain(17)
@@ -18,7 +18,7 @@ repositories {
 
 dependencies {
     // Session-aware web client (our own library)
-    implementation("com.github.tomdh-git:session-aware-web-client:-SNAPSHOT")
+    implementation("com.github.tomdh-git:session-aware-web-client:master-SNAPSHOT")
 
     // Spring Boot (non-starter, so we don't pull in auto-config)
     implementation("org.springframework.boot:spring-boot-starter-webflux:3.3.4")
