@@ -6,6 +6,9 @@ import com.tomdh.schoolconnector.exceptions.types.QueryException
 import com.tomdh.schoolconnector.field.Field
 import com.tomdh.schoolconnector.school.SchoolConnector
 import com.tomdh.schoolconnector.school.SchoolSchema
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.slf4j.LoggerFactory
@@ -61,9 +64,13 @@ class MiamiConnector(
         }
 
         val courses = resp.body.parseMiamiCoursesToSections()
-        for (course in courses) {
-            val temp = course.data + ("details" to client.getCourseDetails(filters["term"].toString(), course.data["crn"].toString()))
-            course.data = temp
+        coroutineScope {
+            courses.map { course ->
+                async {
+                    val temp = course.data + ("details" to client.getCourseDetails(filters["term"].toString(), course.data["crn"].toString()))
+                    course.data = temp
+                }
+            }.awaitAll()
         }
         return courses
     }

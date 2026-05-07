@@ -1,9 +1,9 @@
 {
   "formatVersion": "1.1",
   "component": {
-    "group": "com.tomdh.courseapi",
+    "group": "com.github.tomdh-git",
     "module": "school-connector",
-    "version": "1.0.0",
+    "version": "unspecified",
     "attributes": {
       "org.gradle.status": "release"
     }
@@ -27,13 +27,13 @@
       },
       "files": [
         {
-          "name": "school-connector-1.0.0.jar",
-          "url": "school-connector-1.0.0.jar",
-          "size": 63259,
-          "sha512": "b765cccbc3e0ef9c9702991447385ecff18161a10935a2633a50c2d753f3bc344e1dd578d7b8150438c516ca5386a33d00afa754452691959a36b02eb2466003",
-          "sha256": "1a3f605ba2e5edceedc16088a65dcb35588b7ed01f796f0d4b3945847927aa29",
-          "sha1": "df5a0fb165681d6cb07cab8876aa211b10b7fab6",
-          "md5": "248b48e7dcd029fd37bc0eee57206c48"
+          "name": "school-connector-unspecified.jar",
+          "url": "school-connector-unspecified.jar",
+          "size": 67779,
+          "sha512": "a96451cc2cf183f325b8f17f0e9a9df2870f6547eda3c5088e99bbf12aac5f5e1d661bbc3ff703a2dd20e126d08613e31381dbd5197263da633120978598f36e",
+          "sha256": "25806eab8a649d8df8755bcb891ec14849df44fabc7df9d5478a3f4bed4d955f",
+          "sha1": "8788706af93d5bf6a4138ff99b5af31722c7a73a",
+          "md5": "e3c1070b05a03ea4a0f2fd34d447b59e"
         }
       ]
     },
@@ -50,10 +50,10 @@
       },
       "dependencies": [
         {
-          "group": "com.tomdh.courseapi",
+          "group": "com.github.tomdh-git",
           "module": "session-aware-web-client",
           "version": {
-            "requires": "1.0.0"
+            "requires": "master-SNAPSHOT"
           }
         },
         {
@@ -135,13 +135,13 @@
       ],
       "files": [
         {
-          "name": "school-connector-1.0.0.jar",
-          "url": "school-connector-1.0.0.jar",
-          "size": 63259,
-          "sha512": "b765cccbc3e0ef9c9702991447385ecff18161a10935a2633a50c2d753f3bc344e1dd578d7b8150438c516ca5386a33d00afa754452691959a36b02eb2466003",
-          "sha256": "1a3f605ba2e5edceedc16088a65dcb35588b7ed01f796f0d4b3945847927aa29",
-          "sha1": "df5a0fb165681d6cb07cab8876aa211b10b7fab6",
-          "md5": "248b48e7dcd029fd37bc0eee57206c48"
+          "name": "school-connector-unspecified.jar",
+          "url": "school-connector-unspecified.jar",
+          "size": 67779,
+          "sha512": "a96451cc2cf183f325b8f17f0e9a9df2870f6547eda3c5088e99bbf12aac5f5e1d661bbc3ff703a2dd20e126d08613e31381dbd5197263da633120978598f36e",
+          "sha256": "25806eab8a649d8df8755bcb891ec14849df44fabc7df9d5478a3f4bed4d955f",
+          "sha1": "8788706af93d5bf6a4138ff99b5af31722c7a73a",
+          "md5": "e3c1070b05a03ea4a0f2fd34d447b59e"
         }
       ]
     }

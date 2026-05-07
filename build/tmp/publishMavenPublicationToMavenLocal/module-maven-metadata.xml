@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <metadata>
-  <groupId>com.tomdh.courseapi</groupId>
+  <groupId>com.github.tomdh-git</groupId>
   <artifactId>school-connector</artifactId>
   <versioning>
-    <latest>1.0.0</latest>
-    <release>1.0.0</release>
+    <latest>unspecified</latest>
+    <release>unspecified</release>
     <versions>
-      <version>1.0.0</version>
+      <version>unspecified</version>
     </versions>
-    <lastUpdated>20260505045606</lastUpdated>
+    <lastUpdated>20260507055752</lastUpdated>
   </versioning>
 </metadata>

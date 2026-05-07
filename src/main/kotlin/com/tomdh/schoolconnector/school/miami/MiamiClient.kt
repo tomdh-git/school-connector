@@ -87,18 +87,16 @@ class MiamiClient(
     suspend fun getCourseDetails(term: String, crn: String): JsonNode {
         val mapper = jacksonObjectMapper()
         val uri = "${config.url}sectionDetail/${term}/${crn}"
-        return htmlCacheLock.withLock {
-            val result = webClient.get()
-                .uri(uri)
-                .header("Accept", "application/json")
-                .header("User-Agent", "Mozilla/5.0")
-                .exchangeToMono { response ->
-                    response.cookies().forEach { (name, cookieList) ->
-                        if (cookieList.isNotEmpty()) cookies[name] = cookieList[0].value
-                    }
-                    response.bodyToMono(String::class.java)
-                }.awaitSingle()
-            mapper.readTree(result)
-        }
+        val result = webClient.get()
+            .uri(uri)
+            .header("Accept", "application/json")
+            .header("User-Agent", "Mozilla/5.0")
+            .exchangeToMono { response ->
+                response.cookies().forEach { (name, cookieList) ->
+                    if (cookieList.isNotEmpty()) cookies[name] = cookieList[0].value
+                }
+                response.bodyToMono(String::class.java)
+            }.awaitSingle()
+        return mapper.readTree(result)
     }
 }
